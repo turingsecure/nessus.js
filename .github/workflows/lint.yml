@@ -4,21 +4,17 @@ on:
   push:
   pull_request:
     branches:
-      - main
 
 jobs:
-  check:
+  job:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.4.1
-        with:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
-
+      - uses: actions/checkout@v1
+      - name: Prepare
+        run: npm lint
       - name: Lint
-        run: |
-          yarn lint
+        uses: mooyoul/tslint-actions@v1.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pattern: '*.ts'
