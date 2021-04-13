@@ -102,7 +102,7 @@ type CM = {
 }
 
 function parseXml(xml: string) {
-  if (typeof window !== 'undefined') {
+  if (typeof (window as any) !== 'undefined') {
     const parser: DOMParser = new DOMParser()
 
     return parser.parseFromString(xml, 'application/xml')
@@ -201,7 +201,9 @@ export function NessusParser(xml: string): Scan {
       compliance: reportItem.getElementsByTagName('compliance')[0].innerHTML,
       riskFactor: reportItem.getElementsByTagName('risk_factor')[0].innerHTML,
       scriptVersion: reportItem.getElementsByTagName('script_version')[0].innerHTML,
-      solution: reportItem.getElementsByTagName('solution')[0]?.innerHTML,
+      solution: reportItem.getElementsByTagName('solution')[0]
+        ? reportItem.getElementsByTagName('solution')[0].innerHTML
+        : undefined,
       cm: {
         checkName: reportItem.getElementsByTagName('cm:compliance-check-name')[0].innerHTML,
         source: reportItem.getElementsByTagName('cm:compliance-source')[0].innerHTML,
