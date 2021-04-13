@@ -1,8 +1,15 @@
 {
   "name": "@turingsecure/nessus.js",
-  "version": "0.0.1",
-  "description": "",
-  "keywords": [],
+  "version": "0.0.2",
+  "description": "nessus.js is library to parse nessus output files into javascript.",
+  "keywords": [
+    "burp",
+    "xml",
+    "parser",
+    "security",
+    "javascript",
+    "itsec"
+  ],
   "main": "dist/nessus-js.umd.js",
   "module": "dist/nessus-js.es5.js",
   "typings": "dist/types/nessus-js.d.ts",
@@ -12,8 +19,12 @@
   "author": "Fabian Kutsche <kutschefabian@gmail.com>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/turingsecure/nessus.js.git"
   },
+  "bugs": {
+    "url": "https://github.com/turingsecure/nessus.js/issues"
+  },
+  "homepage": "https://github.com/turingsecure/nessus.js#readme",
   "license": "MIT",
   "engines": {
     "node": ">=6.0.0"
