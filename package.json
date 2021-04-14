@@ -1,6 +1,6 @@
 {
   "name": "@turingsecure/nessus.js",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "nessus.js is library to parse nessus output files into javascript.",
   "keywords": [
     "burp",
