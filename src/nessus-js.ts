@@ -130,7 +130,7 @@ function parseXml(xml: string) {
 function createComplianceItem(reportItem: HTMLElement): ReportItem {
   return {
     port: reportItem.getAttribute('port'),
-    svcName: reportItem.getAttribute('svc-name'),
+    svcName: reportItem.getAttribute('svc_name'),
     protocol: reportItem.getAttribute('protocol'),
     severity: reportItem.getAttribute('severity'),
     plugin: {
@@ -169,7 +169,7 @@ function createComplianceItem(reportItem: HTMLElement): ReportItem {
 function createVulnerabilityItem(reportItem: HTMLElement): ReportItem {
   return {
     port: reportItem.getAttribute('port'),
-    svcName: reportItem.getAttribute('svc-name'),
+    svcName: reportItem.getAttribute('svc_name'),
     protocol: reportItem.getAttribute('protocol'),
     severity: reportItem.getAttribute('severity'),
     plugin: {
@@ -192,15 +192,15 @@ function createVulnerabilityItem(reportItem: HTMLElement): ReportItem {
     seeAlso: reportItem.getElementsByTagName('see_also')[0]?.innerHTML,
     cpe: reportItem.getElementsByTagName('cpe')[0]?.innerHTML,
     xref: reportItem.getElementsByTagName('xref')[0]?.innerHTML,
-    vulnPublicationDate: reportItem.getElementsByTagName('vuln-publication-date')[0]?.innerHTML,
+    vulnPublicationDate: reportItem.getElementsByTagName('vuln_publication_date')[0]?.innerHTML,
     cwe: reportItem.getElementsByTagName('cwe')[0]?.innerHTML,
     cve: reportItem.getElementsByTagName('cve')[0]?.innerHTML,
     iavt: reportItem.getElementsByTagName('iavt')[0]?.innerHTML,
-    cvss3BaseScore: reportItem.getElementsByTagName('cvss3-base-score')[0]?.innerHTML,
-    cvss3Vector: reportItem.getElementsByTagName('cvss3-vector')[0]?.innerHTML,
-    cvssBaseScore: reportItem.getElementsByTagName('cvss-base-score')[0]?.innerHTML,
-    cvssScoreSource: reportItem.getElementsByTagName('cvss-score-source')[0]?.innerHTML,
-    cvssVector: reportItem.getElementsByTagName('cvss-vector')[0]?.innerHTML,
+    cvss3BaseScore: reportItem.getElementsByTagName('cvss3_base_score')[0]?.innerHTML,
+    cvss3Vector: reportItem.getElementsByTagName('cvss3_vector')[0]?.innerHTML,
+    cvssBaseScore: reportItem.getElementsByTagName('cvss_base_score')[0]?.innerHTML,
+    cvssScoreSource: reportItem.getElementsByTagName('cvss_score_source')[0]?.innerHTML,
+    cvssVector: reportItem.getElementsByTagName('cvss_vector')[0]?.innerHTML,
   }
 }
 
