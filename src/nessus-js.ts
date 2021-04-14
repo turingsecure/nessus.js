@@ -1,6 +1,6 @@
 type Scan = {
   policy: Policy
-  report?: Report
+  report: Report
 }
 
 type Report = {
@@ -64,27 +64,41 @@ type PluginPreferencesItem = {
 }
 
 type ReportItem = {
-  port: string
-  svcName: string
-  protocol: string
-  severity: string
+  port: string | null
+  svcName: string | null
+  protocol: string | null
+  severity: string | null
   plugin: Plugin
   description: string
   fname: string
   riskFactor: string
   scriptVersion: string
-  solution: string
-  compliance: string
-  cm: CM
+  solution: string | null
+  synopsis?: string
+  seeAlso?: string
+  cpe?: string
+  xref?: string
+  vulnPublicationDate?: string
+  cwe?: string
+  cve?: string
+  cvss3BaseScore?: string
+  cvss3Vector?: string
+  cvssBaseScore?: string
+  cvssScoreSource?: string
+  cvssVector?: string
+  iavt?: string
+  compliance?: string
+  cm?: CM
 }
 
 type Plugin = {
-  id: string
-  name: string
-  family: string
+  id: string | null
+  name: string | null
+  family: string | null
   modificationDate: string
   publicationDate: string
   type: string
+  output?: string
 }
 
 type CM = {
@@ -113,6 +127,83 @@ function parseXml(xml: string) {
   return new jsdom.JSDOM(xml).window.document
 }
 
+function createComplianceItem(reportItem: HTMLElement): ReportItem {
+  return {
+    port: reportItem.getAttribute('port'),
+    svcName: reportItem.getAttribute('svc-name'),
+    protocol: reportItem.getAttribute('protocol'),
+    severity: reportItem.getAttribute('severity'),
+    plugin: {
+      id: reportItem.getAttribute('pluginID'),
+      name: reportItem.getAttribute('pluginName'),
+      family: reportItem.getAttribute('pluginFamily'),
+      modificationDate: reportItem.getElementsByTagName('plugin_modification_date')[0].innerHTML,
+      publicationDate: reportItem.getElementsByTagName('plugin_publication_date')[0].innerHTML,
+      type: reportItem.getElementsByTagName('plugin_type')[0].innerHTML,
+    },
+    description: reportItem.getElementsByTagName('description')[0].innerHTML,
+    fname: reportItem.getElementsByTagName('fname')[0].innerHTML,
+    riskFactor: reportItem.getElementsByTagName('risk_factor')[0].innerHTML,
+    scriptVersion: reportItem.getElementsByTagName('script_version')[0].innerHTML,
+    solution: reportItem.getElementsByTagName('solution')[0]
+      ? reportItem.getElementsByTagName('solution')[0].innerHTML
+      : null,
+    compliance: reportItem.getElementsByTagName('compliance')[0].innerHTML,
+    cm: {
+      checkName: reportItem.getElementsByTagName('cm:compliance-check-name')[0].innerHTML,
+      source: reportItem.getElementsByTagName('cm:compliance-source')[0].innerHTML,
+      auditFile: reportItem.getElementsByTagName('cm:compliance-audit-file')[0].innerHTML,
+      checkId: reportItem.getElementsByTagName('cm:compliance-check-id')[0].innerHTML,
+      policyValue: reportItem.getElementsByTagName('cm:compliance-policy-value')[0].innerHTML,
+      functionalId: reportItem.getElementsByTagName('cm:compliance-functional-id')[0].innerHTML,
+      info: reportItem.getElementsByTagName('cm:compliance-info')[0].innerHTML,
+      result: reportItem.getElementsByTagName('cm:compliance-result')[0].innerHTML,
+      informationalId: reportItem.getElementsByTagName('cm:compliance-informational-id')[0]
+        .innerHTML,
+      reference: reportItem.getElementsByTagName('cm:compliance-reference')[0].innerHTML,
+      solution: reportItem.getElementsByTagName('cm:compliance-solution')[0].innerHTML,
+    },
+  }
+}
+
+function createVulnerabilityItem(reportItem: HTMLElement): ReportItem {
+  return {
+    port: reportItem.getAttribute('port'),
+    svcName: reportItem.getAttribute('svc-name'),
+    protocol: reportItem.getAttribute('protocol'),
+    severity: reportItem.getAttribute('severity'),
+    plugin: {
+      id: reportItem.getAttribute('pluginID'),
+      name: reportItem.getAttribute('pluginName'),
+      family: reportItem.getAttribute('pluginFamily'),
+      modificationDate: reportItem.getElementsByTagName('plugin_modification_date')[0].innerHTML,
+      publicationDate: reportItem.getElementsByTagName('plugin_publication_date')[0].innerHTML,
+      type: reportItem.getElementsByTagName('plugin_type')[0].innerHTML,
+      output: reportItem.getElementsByTagName('plugin_output')[0]?.innerHTML,
+    },
+    description: reportItem.getElementsByTagName('description')[0].innerHTML,
+    fname: reportItem.getElementsByTagName('fname')[0].innerHTML,
+    riskFactor: reportItem.getElementsByTagName('risk_factor')[0].innerHTML,
+    scriptVersion: reportItem.getElementsByTagName('script_version')[0].innerHTML,
+    solution: reportItem.getElementsByTagName('solution')[0]
+      ? reportItem.getElementsByTagName('solution')[0].innerHTML
+      : null,
+    synopsis: reportItem.getElementsByTagName('synopsis')[0].innerHTML,
+    seeAlso: reportItem.getElementsByTagName('see_also')[0]?.innerHTML,
+    cpe: reportItem.getElementsByTagName('cpe')[0]?.innerHTML,
+    xref: reportItem.getElementsByTagName('xref')[0]?.innerHTML,
+    vulnPublicationDate: reportItem.getElementsByTagName('vuln-publication-date')[0]?.innerHTML,
+    cwe: reportItem.getElementsByTagName('cwe')[0]?.innerHTML,
+    cve: reportItem.getElementsByTagName('cve')[0]?.innerHTML,
+    iavt: reportItem.getElementsByTagName('iavt')[0]?.innerHTML,
+    cvss3BaseScore: reportItem.getElementsByTagName('cvss3-base-score')[0]?.innerHTML,
+    cvss3Vector: reportItem.getElementsByTagName('cvss3-vector')[0]?.innerHTML,
+    cvssBaseScore: reportItem.getElementsByTagName('cvss-base-score')[0]?.innerHTML,
+    cvssScoreSource: reportItem.getElementsByTagName('cvss-score-source')[0]?.innerHTML,
+    cvssVector: reportItem.getElementsByTagName('cvss-vector')[0]?.innerHTML,
+  }
+}
+
 /**
  *  Parses nessus xml output to a javascript object
  *
@@ -127,24 +218,24 @@ export function NessusParser(xml: string): Scan {
     policyName: parsed.getElementsByTagName('policyName')[0].innerHTML,
     preferences: {
       serverPreferences: {
-        preferences: []
+        preferences: [],
       },
       pluginPreferences: {
-        items: []
-      }
+        items: [],
+      },
     },
     familySelection: {
-      familyItems: []
+      familyItems: [],
     },
     individualPluginSelection: {
-      pluginItems: []
-    }
+      pluginItems: [],
+    },
   }
 
   for (const serverPreference of parsed.getElementsByTagName('preference')) {
     policy.preferences.serverPreferences.preferences.push({
       name: serverPreference.getElementsByTagName('name')[0].innerHTML,
-      value: serverPreference.getElementsByTagName('value')[0].innerHTML
+      value: serverPreference.getElementsByTagName('value')[0].innerHTML,
     })
   }
 
@@ -156,14 +247,14 @@ export function NessusParser(xml: string): Scan {
       preferenceName: pluginPreference.getElementsByTagName('preferenceName')[0].innerHTML,
       preferenceType: pluginPreference.getElementsByTagName('preferenceType')[0].innerHTML,
       preferenceValues: pluginPreference.getElementsByTagName('preferenceValues')[0].innerHTML,
-      selectedValues: pluginPreference.getElementsByTagName('selectedValue')[0].innerHTML
+      selectedValues: pluginPreference.getElementsByTagName('selectedValue')[0].innerHTML,
     })
   }
 
   for (const familyItem of parsed.getElementsByTagName('FamilyItem')) {
     policy.familySelection.familyItems.push({
       familyName: familyItem.getElementsByTagName('FamilyName')[0].innterHTML,
-      status: familyItem.getElementsByTagName('Status')[0].innterHTML
+      status: familyItem.getElementsByTagName('Status')[0].innterHTML,
     })
   }
 
@@ -172,58 +263,27 @@ export function NessusParser(xml: string): Scan {
       pluginId: pluginSelection.getElementsByTagName('PluginId')[0].innerHTML,
       pluginName: pluginSelection.getElementsByTagName('PluginName')[0].innerHTML,
       family: pluginSelection.getElementsByTagName('Family')[0].innerHTML,
-      status: pluginSelection.getElementsByTagName('Status')[0].innerHTML
+      status: pluginSelection.getElementsByTagName('Status')[0].innerHTML,
     })
   }
 
   const report: Report = {
     name: parsed.getElementsByTagName('Report')[0].getAttribute('name'),
     reportHost: parsed.getElementsByTagName('ReportHost')[0].getAttribute('name'),
-    reportItems: []
+    reportItems: [],
   }
 
   for (const reportItem of parsed.getElementsByTagName('ReportItem')) {
-    report.reportItems.push({
-      port: reportItem.getAttribute('port'),
-      svcName: reportItem.getAttribute('svc-name'),
-      protocol: reportItem.getAttribute('protocol'),
-      severity: reportItem.getAttribute('severity'),
-      plugin: {
-        id: reportItem.getAttribute('pluginID'),
-        name: reportItem.getAttribute('pluginName'),
-        family: reportItem.getAttribute('pluginFamily'),
-        modificationDate: reportItem.getElementsByTagName('plugin_modification_date')[0].innerHTML,
-        publicationDate: reportItem.getElementsByTagName('plugin_publication_date')[0].innerHTML,
-        type: reportItem.getElementsByTagName('plugin_type')[0].innerHTML
-      },
-      description: reportItem.getElementsByTagName('description')[0].innerHTML,
-      fname: reportItem.getElementsByTagName('fname')[0].innerHTML,
-      compliance: reportItem.getElementsByTagName('compliance')[0].innerHTML,
-      riskFactor: reportItem.getElementsByTagName('risk_factor')[0].innerHTML,
-      scriptVersion: reportItem.getElementsByTagName('script_version')[0].innerHTML,
-      solution: reportItem.getElementsByTagName('solution')[0]
-        ? reportItem.getElementsByTagName('solution')[0].innerHTML
-        : undefined,
-      cm: {
-        checkName: reportItem.getElementsByTagName('cm:compliance-check-name')[0].innerHTML,
-        source: reportItem.getElementsByTagName('cm:compliance-source')[0].innerHTML,
-        auditFile: reportItem.getElementsByTagName('cm:compliance-audit-file')[0].innerHTML,
-        checkId: reportItem.getElementsByTagName('cm:compliance-check-id')[0].innerHTML,
-        policyValue: reportItem.getElementsByTagName('cm:compliance-policy-value')[0].innerHTML,
-        functionalId: reportItem.getElementsByTagName('cm:compliance-functional-id')[0].innerHTML,
-        info: reportItem.getElementsByTagName('cm:compliance-info')[0].innerHTML,
-        result: reportItem.getElementsByTagName('cm:compliance-result')[0].innerHTML,
-        informationalId: reportItem.getElementsByTagName('cm:compliance-informational-id')[0]
-          .innerHTML,
-        reference: reportItem.getElementsByTagName('cm:compliance-reference')[0].innerHTML,
-        solution: reportItem.getElementsByTagName('cm:compliance-solution')[0].innerHTML
-      }
-    })
+    if (reportItem.getElementsByTagName('compliance')[0]?.innerHTML === 'true') {
+      report.reportItems.push(createComplianceItem(reportItem))
+    } else {
+      report.reportItems.push(createVulnerabilityItem(reportItem))
+    }
   }
 
   const scan: Scan = {
     policy,
-    report
+    report,
   }
 
   return scan
