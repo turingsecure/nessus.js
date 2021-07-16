@@ -77,7 +77,7 @@ PASSED`,
     scriptVersion: '$Revision: 1.153 $',
     severity: '0',
     solution: null,
-    svcName: null,
+    svcName: 'general',
   })
 })
 
@@ -129,7 +129,7 @@ Credentials were not provided for detected SSH service.
     seeAlso: undefined,
     severity: '0',
     solution: 'n/a',
-    svcName: null,
+    svcName: 'general',
     synopsis: 'Local checks were not enabled.',
     vulnPublicationDate: undefined,
     xref: 'IAVB:0001-B-515',
