@@ -4,6 +4,7 @@ const path = require('path')
 
 const file = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan.nessus'))
 const file2 = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan2.nessus'))
+const file3 = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan3.nessus'))
 
 test('Should parse nessus compliance file', () => {
   const output = NessusParser(file)
@@ -134,4 +135,15 @@ Credentials were not provided for detected SSH service.
     vulnPublicationDate: undefined,
     xref: 'IAVB:0001-B-515',
   })
+})
+
+test('Should parse empty nessus report file', () => {
+  const output = NessusParser(file3)
+
+  expect(output.policy.policyName).toBe('Basic Scan')
+  expect(output.policy.preferences.serverPreferences.preferences.length).toBe(87)
+  expect(output.policy.preferences.pluginPreferences.items.length).toBe(933)
+  expect(output.policy.familySelection.familyItems.length).toBe(59)
+  expect(output.policy.individualPluginSelection.pluginItems.length).toBe(5)
+  expect(output.report.reportItems.length).toBe(0)
 })
