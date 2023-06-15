@@ -5,6 +5,7 @@ const path = require('path')
 const file = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan.nessus'))
 const file2 = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan2.nessus'))
 const file3 = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan3.nessus'))
+const file4 = fs.readFileSync(path.join(__dirname, '__testdata__', 'scan4.nessus'))
 
 test('Should parse nessus compliance file', () => {
   const output = NessusParser(file)
@@ -14,8 +15,8 @@ test('Should parse nessus compliance file', () => {
   expect(output.policy.preferences.pluginPreferences.items.length).toBe(742)
   expect(output.policy.familySelection.familyItems.length).toBe(54)
   expect(output.policy.individualPluginSelection.pluginItems.length).toBe(3)
-  expect(output.report.reportItems.length).toBe(86)
-  expect(output.report.reportItems[0]).toStrictEqual({
+  expect(output.reports[0].reportItems.length).toBe(86)
+  expect(output.reports[0].reportItems[0]).toStrictEqual({
     cm: {
       auditFile: 'CIS_Microsoft_Azure_Foundations_L1_v1.1.0.audit',
       checkId: 'af5bd955a4843a16157b895f6d1270861c0c61fed7eb6c3cd13c8a41aab8221a',
@@ -90,8 +91,8 @@ test('Should parse nessus vulnerability file', () => {
   expect(output.policy.preferences.pluginPreferences.items.length).toBe(742)
   expect(output.policy.familySelection.familyItems.length).toBe(54)
   expect(output.policy.individualPluginSelection.pluginItems.length).toBe(5)
-  expect(output.report.reportItems.length).toBe(20)
-  expect(output.report.reportItems[0]).toStrictEqual({
+  expect(output.reports[0].reportItems.length).toBe(20)
+  expect(output.reports[0].reportItems[0]).toStrictEqual({
     cpe: undefined,
     cve: undefined,
     cvss3BaseScore: undefined,
@@ -135,6 +136,7 @@ Credentials were not provided for detected SSH service.
     vulnPublicationDate: undefined,
     xref: 'IAVB:0001-B-515',
   })
+  expect(output.reports[0].hostProperties.hostEndTimestamp).toBe('1616086095')
 })
 
 test('Should parse empty nessus report file', () => {
@@ -145,5 +147,62 @@ test('Should parse empty nessus report file', () => {
   expect(output.policy.preferences.pluginPreferences.items.length).toBe(933)
   expect(output.policy.familySelection.familyItems.length).toBe(59)
   expect(output.policy.individualPluginSelection.pluginItems.length).toBe(5)
-  expect(output.report.reportItems.length).toBe(0)
+  expect(output.reports.length).toBe(0)
+})
+
+test('Should parse nessus vulnerability file with two hosts', () => {
+  const output = NessusParser(file4)
+
+  expect(output.policy.policyName).toBe('Advanced Scan')
+  expect(output.policy.preferences.serverPreferences.preferences.length).toBe(60)
+  expect(output.policy.preferences.pluginPreferences.items.length).toBe(742)
+  expect(output.policy.familySelection.familyItems.length).toBe(54)
+  expect(output.policy.individualPluginSelection.pluginItems.length).toBe(5)
+  expect(output.reports[0].reportItems.length).toBe(20)
+  expect(output.reports[1].reportItems.length).toBe(20)
+
+  //   expect(output.reports[0].reportItems[0]).toStrictEqual({
+  //     cpe: undefined,
+  //     cve: undefined,
+  //     cvss3BaseScore: undefined,
+  //     cvss3Vector: undefined,
+  //     cvssBaseScore: undefined,
+  //     cvssScoreSource: undefined,
+  //     cvssVector: undefined,
+  //     cwe: undefined,
+  //     description: `Nessus did not enable local checks on the remote host. This does not necessarily indicate a problem with the scan. Credentials may not have been provided, local checks may not be available for the target, the target may not have been identified, or another issue may have occurred that prevented local checks from being enabled. See plugin output for details.
+
+  // This plugin reports informational findings related to local checks not being enabled. For failure information, see plugin 21745 :
+  // 'Authentication Failure - Local Checks Not Run'.`,
+  //     fname: 'hostlevel_checks_skipped.nasl',
+  //     iavt: undefined,
+  //     plugin: {
+  //       family: 'Settings',
+  //       id: '117886',
+  //       modificationDate: '2020/08/25',
+  //       name: 'Local Checks Not Enabled (info)',
+  //       output: `
+  // The following issues were reported :
+
+  //   - Plugin      : no_local_checks_credentials.nasl
+  //     Plugin ID   : 110723
+  //     Plugin Name : No Credentials Provided
+  //     Message     :
+  // Credentials were not provided for detected SSH service.
+  // `,
+  //       publicationDate: '2018/10/02',
+  //       type: 'summary',
+  //     },
+  //     port: '0',
+  //     protocol: 'tcp',
+  //     riskFactor: 'None',
+  //     scriptVersion: '1.6',
+  //     seeAlso: undefined,
+  //     severity: '0',
+  //     solution: 'n/a',
+  //     svcName: 'general',
+  //     synopsis: 'Local checks were not enabled.',
+  //     vulnPublicationDate: undefined,
+  //     xref: 'IAVB:0001-B-515',
+  //   })
 })

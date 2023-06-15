@@ -1,12 +1,13 @@
 type Scan = {
   policy: Policy
-  report: Report
+  reports: Report[]
 }
 
 type Report = {
   reportItems: ReportItem[]
   reportHost: string
   name: string
+  hostProperties: HostProperties
 }
 
 type Policy = {
@@ -115,6 +116,34 @@ type CM = {
   solution: string
 }
 
+type HostProperties = {
+  hostEndTimestamp: string
+  hostEnd: string
+  cpe4: string
+  cpe3: string
+  cpe2: string
+  cpe1: string
+  cpe0: string
+  patchSummaryTotalCves: string
+  cpe: string
+  os: string
+  operatingSystemConf: string
+  operatingSystemMethod: string
+  sshFingerprint: string
+  systemType: string
+  operatingSystem: string
+  sapNetweaverAsBanner: string
+  tracerouteHop1: string
+  tracerouteHop0: string
+  sinfpMlPrediction: string
+  sinfpSignature: string
+  hostFqdn: string
+  hostRdns: string
+  hostIp: string
+  hostStartTimestamp: string
+  hostStart: string
+}
+
 function parseXml(xml: string) {
   if (typeof (window as any) !== 'undefined') {
     const parser: DOMParser = new DOMParser()
@@ -125,6 +154,13 @@ function parseXml(xml: string) {
   const jsdom = require('jsdom')
 
   return new jsdom.JSDOM(xml).window.document
+}
+
+function camelize(str: string) {
+  return str
+    .slice(1, str.length - 1)
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
 }
 
 function createComplianceItem(reportItem: HTMLElement): ReportItem | null {
@@ -270,29 +306,77 @@ export function NessusParser(xml: string): Scan | null {
     })
   }
 
-  const report: Report = {
-    name: parsed.getElementsByTagName('Report')?.[0]?.getAttribute('name'),
-    reportHost: parsed.getElementsByTagName('ReportHost')?.[0]?.getAttribute('name'),
-    reportItems: [],
-  }
+  const reportName: string = parsed.getElementsByTagName('Report')?.[0]?.getAttribute('name')
+  const reportHosts: Array<HTMLElement> = [...parsed.getElementsByTagName('ReportHost')]
+  const reports: Array<Report> = []
 
-  for (const reportItem of parsed.getElementsByTagName('ReportItem') || []) {
-    if (reportItem.getElementsByTagName('compliance')?.[0]?.innerHTML === 'true') {
-      const complianceItem: ReportItem | null = createComplianceItem(reportItem)
-      if (complianceItem) {
-        report.reportItems.push(complianceItem)
-      }
-    } else {
-      const vulnerabilityItem: ReportItem | null = createVulnerabilityItem(reportItem)
-      if (vulnerabilityItem) {
-        report.reportItems.push(vulnerabilityItem)
+  reportHosts.forEach((reportHost) => {
+    const report: Report = {
+      name: reportName,
+      reportHost: JSON.stringify(reportHost.getAttribute('name')),
+      reportItems: [],
+      hostProperties: {
+        hostEndTimestamp: '',
+        hostEnd: '',
+        cpe4: '',
+        cpe3: '',
+        cpe2: '',
+        cpe1: '',
+        cpe0: '',
+        patchSummaryTotalCves: '',
+        cpe: '',
+        os: '',
+        operatingSystemConf: '',
+        operatingSystemMethod: '',
+        sshFingerprint: '',
+        systemType: '',
+        operatingSystem: '',
+        sapNetweaverAsBanner: '',
+        tracerouteHop1: '',
+        tracerouteHop0: '',
+        sinfpMlPrediction: '',
+        sinfpSignature: '',
+        hostFqdn: '',
+        hostRdns: '',
+        hostIp: '',
+        hostStartTimestamp: '',
+        hostStart: '',
+      },
+    }
+
+    for (const reportItem of <any>reportHost.getElementsByTagName('ReportItem') || []) {
+      if (reportItem.getElementsByTagName('compliance')?.[0]?.innerHTML === 'true') {
+        const complianceItem: ReportItem | null = createComplianceItem(reportItem)
+        if (complianceItem) {
+          report.reportItems.push(complianceItem)
+        }
+      } else {
+        const vulnerabilityItem: ReportItem | null = createVulnerabilityItem(reportItem)
+        if (vulnerabilityItem) {
+          report.reportItems.push(vulnerabilityItem)
+        }
       }
     }
-  }
+
+    const childArray = [
+      ...(<any>reportHost.getElementsByTagName('HostProperties')?.[0]?.children || []),
+    ]
+    if (childArray?.length) {
+      const hostProperties: HostProperties = childArray.reduce(
+        (accumulated: Object, child: Element) => ({
+          ...accumulated,
+          [camelize(JSON.stringify(child.getAttribute('name')))]: child.innerHTML,
+        }),
+        {}
+      )
+      report.hostProperties = hostProperties
+    }
+    reports.push(report)
+  })
 
   const scan: Scan = {
     policy,
-    report,
+    reports,
   }
 
   return scan
