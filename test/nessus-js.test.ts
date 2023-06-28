@@ -161,48 +161,95 @@ test('Should parse nessus vulnerability file with two hosts', () => {
   expect(output.reports[0].reportItems.length).toBe(20)
   expect(output.reports[1].reportItems.length).toBe(20)
 
-  //   expect(output.reports[0].reportItems[0]).toStrictEqual({
-  //     cpe: undefined,
-  //     cve: undefined,
-  //     cvss3BaseScore: undefined,
-  //     cvss3Vector: undefined,
-  //     cvssBaseScore: undefined,
-  //     cvssScoreSource: undefined,
-  //     cvssVector: undefined,
-  //     cwe: undefined,
-  //     description: `Nessus did not enable local checks on the remote host. This does not necessarily indicate a problem with the scan. Credentials may not have been provided, local checks may not be available for the target, the target may not have been identified, or another issue may have occurred that prevented local checks from being enabled. See plugin output for details.
+  expect(output.reports[0].reportItems[0]).toStrictEqual({
+    port: '0',
+    svcName: 'general',
+    protocol: 'tcp',
+    severity: '0',
+    plugin: {
+      id: '117886',
+      name: 'Local Checks Not Enabled (info)',
+      family: 'Settings',
+      modificationDate: '2020/08/25',
+      publicationDate: '2018/10/02',
+      type: 'summary',
+      output:
+        '\n' +
+        'The following issues were reported :\n' +
+        '\n' +
+        '  - Plugin      : no_local_checks_credentials.nasl\n' +
+        '    Plugin ID   : 110723\n' +
+        '    Plugin Name : No Credentials Provided\n' +
+        '    Message     : \n' +
+        'Credentials were not provided for detected SSH service.\n',
+    },
+    description:
+      'Nessus did not enable local checks on the remote host. This does not necessarily indicate a problem with the scan. Credentials may not have been provided, local checks may not be available for the target, the target may not have been identified, or another issue may have occurred that prevented local checks from being enabled. See plugin output for details.\n' +
+      '\n' +
+      'This plugin reports informational findings related to local checks not being enabled. For failure information, see plugin 21745 :\n' +
+      "'Authentication Failure - Local Checks Not Run'.",
+    fname: 'hostlevel_checks_skipped.nasl',
+    riskFactor: 'None',
+    scriptVersion: '1.6',
+    solution: 'n/a',
+    synopsis: 'Local checks were not enabled.',
+    seeAlso: undefined,
+    cpe: undefined,
+    xref: 'IAVB:0001-B-515',
+    vulnPublicationDate: undefined,
+    cwe: undefined,
+    cve: undefined,
+    iavt: undefined,
+    cvss3BaseScore: undefined,
+    cvss3Vector: undefined,
+    cvssBaseScore: undefined,
+    cvssScoreSource: undefined,
+    cvssVector: undefined,
+  })
 
-  // This plugin reports informational findings related to local checks not being enabled. For failure information, see plugin 21745 :
-  // 'Authentication Failure - Local Checks Not Run'.`,
-  //     fname: 'hostlevel_checks_skipped.nasl',
-  //     iavt: undefined,
-  //     plugin: {
-  //       family: 'Settings',
-  //       id: '117886',
-  //       modificationDate: '2020/08/25',
-  //       name: 'Local Checks Not Enabled (info)',
-  //       output: `
-  // The following issues were reported :
-
-  //   - Plugin      : no_local_checks_credentials.nasl
-  //     Plugin ID   : 110723
-  //     Plugin Name : No Credentials Provided
-  //     Message     :
-  // Credentials were not provided for detected SSH service.
-  // `,
-  //       publicationDate: '2018/10/02',
-  //       type: 'summary',
-  //     },
-  //     port: '0',
-  //     protocol: 'tcp',
-  //     riskFactor: 'None',
-  //     scriptVersion: '1.6',
-  //     seeAlso: undefined,
-  //     severity: '0',
-  //     solution: 'n/a',
-  //     svcName: 'general',
-  //     synopsis: 'Local checks were not enabled.',
-  //     vulnPublicationDate: undefined,
-  //     xref: 'IAVB:0001-B-515',
-  //   })
+  expect(output.reports[1].reportItems[0]).toStrictEqual({
+    port: '0',
+    svcName: 'general',
+    protocol: 'tcp',
+    severity: '0',
+    plugin: {
+      id: '117886',
+      name: 'Local Checks Not Enabled (info)',
+      family: 'Settings',
+      modificationDate: '2020/08/25',
+      publicationDate: '2018/10/02',
+      type: 'summary',
+      output:
+        '\n' +
+        'The following issues were reported :\n' +
+        '\n' +
+        '  - Plugin      : no_local_checks_credentials.nasl\n' +
+        '    Plugin ID   : 110723\n' +
+        '    Plugin Name : No Credentials Provided\n' +
+        '    Message     : \n' +
+        'Credentials were not provided for detected SSH service.\n',
+    },
+    description:
+      'Nessus did not enable local checks on the remote host. This does not necessarily indicate a problem with the scan. Credentials may not have been provided, local checks may not be available for the target, the target may not have been identified, or another issue may have occurred that prevented local checks from being enabled. See plugin output for details.\n' +
+      '\n' +
+      'This plugin reports informational findings related to local checks not being enabled. For failure information, see plugin 21745 :\n' +
+      "'Authentication Failure - Local Checks Not Run'.",
+    fname: 'hostlevel_checks_skipped.nasl',
+    riskFactor: 'None',
+    scriptVersion: '1.6',
+    solution: 'n/a',
+    synopsis: 'Local checks were not enabled.',
+    seeAlso: undefined,
+    cpe: undefined,
+    xref: 'IAVB:0001-B-515',
+    vulnPublicationDate: undefined,
+    cwe: undefined,
+    cve: undefined,
+    iavt: undefined,
+    cvss3BaseScore: undefined,
+    cvss3Vector: undefined,
+    cvssBaseScore: undefined,
+    cvssScoreSource: undefined,
+    cvssVector: undefined,
+  })
 })

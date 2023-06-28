@@ -344,31 +344,32 @@ export function NessusParser(xml: string): Scan | null {
       },
     }
 
-    for (const reportItem of <any>reportHost.getElementsByTagName('ReportItem') || []) {
+    for (const reportItem of Array.from(reportHost.getElementsByTagName('ReportItem') || [])) {
       if (reportItem.getElementsByTagName('compliance')?.[0]?.innerHTML === 'true') {
-        const complianceItem: ReportItem | null = createComplianceItem(reportItem)
+        const complianceItem: ReportItem | null = createComplianceItem(reportItem as HTMLElement)
         if (complianceItem) {
           report.reportItems.push(complianceItem)
         }
       } else {
-        const vulnerabilityItem: ReportItem | null = createVulnerabilityItem(reportItem)
+        const vulnerabilityItem: ReportItem | null = createVulnerabilityItem(
+          reportItem as HTMLElement
+        )
         if (vulnerabilityItem) {
           report.reportItems.push(vulnerabilityItem)
         }
       }
     }
 
-    const childArray = [
-      ...(<any>reportHost.getElementsByTagName('HostProperties')?.[0]?.children || []),
-    ]
+    const childArray = Array.from(
+      reportHost.getElementsByTagName('HostProperties')?.[0]?.children || []
+    )
     if (childArray?.length) {
-      const hostProperties: HostProperties = childArray.reduce(
-        (accumulated: Object, child: Element) => ({
-          ...accumulated,
-          [camelize(JSON.stringify(child.getAttribute('name')))]: child.innerHTML,
-        }),
-        {}
-      )
+      const hostProperties = {} as HostProperties
+      for (const child of childArray) {
+        const index: string = camelize(JSON.stringify(child.getAttribute('name')))
+
+        hostProperties[index as keyof HostProperties] = child.innerHTML
+      }
       report.hostProperties = hostProperties
     }
     reports.push(report)
